@@ -278,6 +278,10 @@ class GameCanvas extends Canvas {
 var game = new GameCanvas()
 game.setSize(992, 496)
 game.setStyle("background","lightgreen")
-//game.playerStart()
-//game.enemyStart ()
+async function startAll(){
+  await game.drawLab()
+  game.playerStart()
+  game.enemyStart ()
+}
+startAll()
 //game.startBuilder()
