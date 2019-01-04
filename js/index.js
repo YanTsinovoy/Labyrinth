@@ -237,10 +237,10 @@ class GameCanvas extends Canvas {
         }
         this.drawLab = () => {
           fetch("json/test.json")
-            .then(response => console.log(response))
-              // .then(resp =>  resp.forEach(
-              //   el => drawWall(el)
-              // )))
+            .then(response => response.json()
+              .then(resp =>  resp.forEach(
+                el => drawWall(el)
+              )))
         }
         this.enemyStart = () => {
             console.log(this,1)
