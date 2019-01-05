@@ -284,11 +284,11 @@ var game = new GameCanvas()
 game.setSize(992, 496)
 game.setStyle("background","#92959baa")
 game.setStyle("marginTop", "2vw")
-// async function startAll(){
-//   await game.drawLab()
-//   game.playerStart()
-//   game.enemyStart ()
-// }
-// startAll()
+async function startAll(){
+  await game.drawLab()
+  game.playerStart()
+  game.enemyStart ()
+}
+startAll()
 
-game.startBuilder()
+// game.startBuilder()
