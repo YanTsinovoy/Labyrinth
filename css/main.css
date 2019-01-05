@@ -1,9 +1,26 @@
-body {
-  background-image: url("../images/backgroundV01.png");
+body, .died, .win {
   display: flex;
   justify-content: center;
   align-items: center;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+}
+body {
+  background-image: url("../images/backgroundV01.png");
+}
+.died, .win {
+  width: 100vw;
+  height: 100vh;
+  font-size: 92px;
+}
+.died {
+  background-image: url("../images/die.png");
+  color: #420202;
+  text-shadow: 0 0 10px red;
+}
+.win {
+  background-image: url("../images/win.jpg");
+  color: #7c7607;
+  text-shadow: 0 0 10px yellow;
 }
