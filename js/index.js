@@ -93,6 +93,10 @@ class GameCanvas extends Canvas {
                 if(walls.length) return !func(persC,persS)
                 return true
         }
+        var plrImg = new Image()
+        plrImg.src = "images/pers.png"
+        var enmImg = new Image()
+        enmImg.src = "images/evil.png"
         var plrStep = 16
         var plrSize = {
             w:16, h:16
@@ -104,7 +108,7 @@ class GameCanvas extends Canvas {
             f: "red"
         }
         var bldColor = {
-            f: "blue"
+            f: "#172235"
         }
         var clearOL = (objLoc, objSize ) => {
             let {x, y} = objLoc
@@ -159,11 +163,7 @@ class GameCanvas extends Canvas {
             x:0, y:0
         }
         this.drawPlayer = () => {
-            this.drawRect (
-                Object.assign(
-                    {}, plrLoc, plrSize, plrColor
-                )
-            )
+            this.area.drawImage (plrImg, plrLoc.x, plrLoc.y)
             plrHis.push (
                 Object.assign({}, plrLoc )
             )
@@ -220,15 +220,28 @@ class GameCanvas extends Canvas {
                 drawBuilder(t)
             }
         }
+        var stepBackward = t => {
+          walls.pop()
+          console.log(walls.length,"stepBacward")
+          clearOL(bldLoc, plrSize)
+          var l = walls.length
+          l ? bldLoc.x = walls[l-1].x : null
+          l ? bldLoc.y = walls[l-1].y : null
+          this.toggle = false
+          drawBuilder(t)
+        }
         this.toggle = false
         this.startBuilder = () => {
-            drawBuilder()
-            document.onkeydown = e => {
-                    console.log(this.toggle)
-                    e.keyCode == 17 ? this.toggle = true
-                        : e.keyCode == 16 ? this.toggle = false
-                                : moveBld(e,this.toggle)
-            }
+          drawBuilder()
+          document.onkeydown = e => {
+                  console.log(this.toggle)
+                  e.keyCode == 17 ? this.toggle = true
+                      : e.keyCode == 16 ? this.toggle = false
+                              : e.keyCode == 226 ? stepBackward(this.toggle)
+                                      :moveBld(e,this.toggle)
+
+          }
+
         }
         this.finBuilder = () => {
                 clearOL(bldLoc, plrSize)
@@ -247,20 +260,12 @@ class GameCanvas extends Canvas {
             setTimeout( function() {
                 console.log(this,2)
                 console.log (this,3)
-                this.drawRect (
-                    Object.assign(
-                        {}, plrHis[0], plrSize, enmColor
-                    )
-                )
+                this.area.drawImage (enmImg, plrHis[0].x, plrHis[0].y)
                 var curPos = 0
                 var timer = setInterval(function(){
                     console.log(this)
                     clearOL(plrHis[curPos++], plrSize)
-                    this.drawRect (
-                        Object.assign(
-                            {}, plrHis[curPos], plrSize, enmColor
-                        )
-                    )
+                    this.area.drawImage(enmImg, plrHis[curPos].x, plrHis[curPos].y)
                     if(
                         plrHis[curPos].x === plrLoc.x
                         && plrHis[curPos].y === plrLoc.y
@@ -277,11 +282,13 @@ class GameCanvas extends Canvas {
 
 var game = new GameCanvas()
 game.setSize(992, 496)
-game.setStyle("background","lightgreen")
+game.setStyle("background","#92959baa")
+game.setStyle("marginTop", "2vw")
 async function startAll(){
   await game.drawLab()
   game.playerStart()
   game.enemyStart ()
 }
 startAll()
-//game.startBuilder()
+
+// game.startBuilder()
