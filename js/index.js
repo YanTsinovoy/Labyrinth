@@ -45,6 +45,7 @@ class GameCanvas extends Canvas {
             rims.y2 = this.canvas.height = height
         }
         var walls = []
+        var questions = []
         var rims = {
             x: 0,
             y: 0,
@@ -97,15 +98,17 @@ class GameCanvas extends Canvas {
         plrImg.src = "images/pers.png"
         var enmImg = new Image()
         enmImg.src = "images/evil.png"
+        var queImg = new Image()
+        queImg.src = "images/quest.png"
+        var finImg = new Image()
+        finImg.src = "images/finish.png"
+        var finishLoc = {
+            x: 976,
+            y: 480
+        }
         var plrStep = 16
         var plrSize = {
             w:16, h:16
-        }
-        var plrColor = {
-            f: "green"
-        }
-        var enmColor = {
-            f: "red"
         }
         var bldColor = {
             f: "#172235"
@@ -126,6 +129,8 @@ class GameCanvas extends Canvas {
                 clearOL ( oldLoc, plrSize )
                 plrLoc.y -= plrStep
                 this.drawPlayer()
+                checkFin()
+                checkQuest(plrLoc) ? alert("Q"): null
             }
             if(
                 event.keyCode == 40
@@ -135,6 +140,8 @@ class GameCanvas extends Canvas {
                 clearOL ( oldLoc, plrSize )
                 plrLoc.y += plrStep
                 this.drawPlayer()
+                checkFin()
+                checkQuest(plrLoc) ? alert("Q"): null
             }
             if(
                 event.keyCode == 37
@@ -144,6 +151,8 @@ class GameCanvas extends Canvas {
                 clearOL ( oldLoc, plrSize )
                 plrLoc.x -= plrStep
                 this.drawPlayer()
+                checkFin()
+                checkQuest(plrLoc) ? alert("Q"): null
             }
             if(
                 event.keyCode == 39
@@ -153,6 +162,8 @@ class GameCanvas extends Canvas {
                 clearOL ( oldLoc, plrSize )
                 plrLoc.x += plrStep
                 this.drawPlayer()
+                checkFin()
+                checkQuest(plrLoc) ? alert("Q"): null
             }
         }
         var plrHis =[]
@@ -163,12 +174,17 @@ class GameCanvas extends Canvas {
             x:0, y:0
         }
         this.drawPlayer = () => {
+            console.log("draw")
+            console.log(this.area)
+            this.area.beginPath()//test
             this.area.drawImage (plrImg, plrLoc.x, plrLoc.y)
             plrHis.push (
                 Object.assign({}, plrLoc )
             )
+            this.area.closePath()//test
         }
         this.playerStart = () => {
+            clearOL(plrLoc, plrSize)//test
             this.drawPlayer()
             document.onkeydown = function(e){
                 plrMove(e)
@@ -177,10 +193,12 @@ class GameCanvas extends Canvas {
         var drawWall = obj => {
             walls.push(obj)
             this.drawRect(obj)
-            console.log(walls)
         }
         var drawBuilder = toggle => {
-            console.warn(2)
+            if(this.que){
+              setQuestion()
+              return
+            }
             var color = toggle ? bldColor :{f:"pink"}
             var bld = Object.assign(
                 {}, bldLoc, plrSize, color
@@ -230,29 +248,68 @@ class GameCanvas extends Canvas {
           this.toggle = false
           drawBuilder(t)
         }
+        var drawCuestion = queLoc => {
+          this.area.drawImage(queImg, queLoc.x, queLoc.y)
+          questions.push(Object.assign(
+            {}, queLoc
+          ))
+        }
+        var setQuestion = () => {
+          if(!this.toggle && this.que){
+            drawCuestion(bldLoc)
+            this.que = false
+            console.log(questions)
+          }
+        }
+        this.drawFinish = () => {
+          this.area.beginPath()
+          this.area.drawImage(finImg, finishLoc.x, finishLoc.y)
+          this.area.closePath()
+        }
+        var gameFin = () => {
+          alert("YOU WON")
+          clearOL(plrLoc, plrSize)
+          this.drawFinish()
+        }
+        var checkFin = () => {
+          plrLoc.x === finishLoc.x && plrLoc.y === finishLoc.y ?
+          gameFin() : null
+        }
+        var checkQuest = currentLoc => {
+          return questions.some(
+            el => el.x === currentLoc.x && el.y === currentLoc.y
+          )
+        }
         this.toggle = false
+        this.que = false
         this.startBuilder = () => {
           drawBuilder()
           document.onkeydown = e => {
                   console.log(this.toggle)
                   e.keyCode == 17 ? this.toggle = true
-                      : e.keyCode == 16 ? this.toggle = false
-                              : e.keyCode == 226 ? stepBackward(this.toggle)
-                                      :moveBld(e,this.toggle)
-
+                  : e.keyCode == 16 ? this.toggle = false
+                  : e.keyCode == 226 ? stepBackward(this.toggle)
+                  : e.keyCode == 90 ? this.que = true
+                  : moveBld(e,this.toggle)
           }
-
         }
         this.finBuilder = () => {
                 clearOL(bldLoc, plrSize)
                 document.onkeydown = null
                 console.log(JSON.stringify(walls))
+                console.warn("questions")
+                console.log(JSON.stringify(questions))
         }
         this.drawLab = () => {
           fetch("json/test.json")
             .then(response => response.json()
               .then(resp =>  resp.forEach(
                 el => drawWall(el)
+              )))
+          fetch("json/quest.json")
+            .then(response => response.json()
+              .then(resp => resp.forEach(
+                el => drawCuestion(el)
               )))
         }
         this.enemyStart = () => {
@@ -274,7 +331,7 @@ class GameCanvas extends Canvas {
                         clearInterval(timer)
                         document.onkeydown = null
                     }
-                }.bind(this),500)
+                }.bind(this),300)
             }.bind(this), 5000 )
         }
     }
@@ -287,8 +344,10 @@ game.setStyle("marginTop", "2vw")
 async function startAll(){
   await game.drawLab()
   game.playerStart()
+  game.drawFinish()
   game.enemyStart ()
 }
-startAll()
-
+window.onload = function(event){
+  startAll()
+}
 // game.startBuilder()
