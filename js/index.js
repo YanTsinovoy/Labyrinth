@@ -1,8 +1,12 @@
 "use strict"
 class Canvas {
     constructor() {
-        this.canvas = document.createElement ( "canvas" )
-        document.body.appendChild ( this.canvas )
+        this.addElem = (tagName, container = document.body) => {
+          return container.appendChild(
+            document.createElement(tagName)
+          )
+        }
+        this.canvas = this.addElem("canvas")
         this.area = this.canvas.getContext ( "2d" )
         this.setStyle = (propName,propValue) => {
             this.canvas.style[propName] = propValue
@@ -187,6 +191,7 @@ class GameCanvas extends Canvas {
             clearOL(plrLoc, plrSize)//test
             this.drawPlayer()
             document.onkeydown = function(e){
+                plrHis.length === 1 ? enemyStart() : null
                 plrMove(e)
             }
         }
@@ -267,9 +272,9 @@ class GameCanvas extends Canvas {
           this.area.closePath()
         }
         var gameFin = () => {
-          alert("YOU WON")
           clearOL(plrLoc, plrSize)
           this.drawFinish()
+          setTimeout(function(){gameOver("YOU WON", "win")}.bind(this),500)
         }
         var checkFin = () => {
           plrLoc.x === finishLoc.x && plrLoc.y === finishLoc.y ?
@@ -312,27 +317,45 @@ class GameCanvas extends Canvas {
                 el => drawCuestion(el)
               )))
         }
-        this.enemyStart = () => {
+        var enmCurPos = 0
+        var enemyPause = false
+        var enemyMove = () => {
+          var timer = setInterval(function(){
+              console.log(this)
+              clearOL(plrHis[enmCurPos], plrSize)
+              !enemyPause ? enmCurPos++ : null
+              this.area.drawImage(enmImg, plrHis[enmCurPos].x, plrHis[enmCurPos].y)
+              if(
+                  plrHis[enmCurPos].x === plrLoc.x
+                  && plrHis[enmCurPos].y === plrLoc.y
+              ){
+                  clearInterval(timer)
+                  gameOver("YOU DIED", "died")
+              }
+          }.bind(this),300)
+          return timer
+        }
+        var enemyStart = () => {
             console.log(this,1)
             setTimeout( function() {
                 console.log(this,2)
-                console.log (this,3)
                 this.area.drawImage (enmImg, plrHis[0].x, plrHis[0].y)
-                var curPos = 0
-                var timer = setInterval(function(){
-                    console.log(this)
-                    clearOL(plrHis[curPos++], plrSize)
-                    this.area.drawImage(enmImg, plrHis[curPos].x, plrHis[curPos].y)
-                    if(
-                        plrHis[curPos].x === plrLoc.x
-                        && plrHis[curPos].y === plrLoc.y
-                    ){
-                        alert("YOU DIED")
-                        clearInterval(timer)
-                        document.onkeydown = null
-                    }
-                }.bind(this),300)
+                enemyMove()
             }.bind(this), 5000 )
+        }
+        var gameOver = (endText, endClass) => {
+            enemyPause = true
+            document.onkeydown = null
+            this.canvas.remove()
+            var over = this.addElem("div")
+            over.className = endClass
+            var mess = this.addElem("div", over)
+            mess.innerText = endText
+        }
+        this.startAll= async function(){
+            await game.drawLab()
+            game.playerStart()
+            game.drawFinish()
         }
     }
 }
@@ -341,13 +364,7 @@ var game = new GameCanvas()
 game.setSize(992, 496)
 game.setStyle("background","#92959baa")
 game.setStyle("marginTop", "2vw")
-async function startAll(){
-  await game.drawLab()
-  game.playerStart()
-  game.drawFinish()
-  game.enemyStart ()
-}
 window.onload = function(event){
-  startAll()
+  game.startAll()
 }
 // game.startBuilder()
