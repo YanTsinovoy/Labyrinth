@@ -1,4 +1,4 @@
-body, .died, .win {
+body, .died, .win, .questWindow {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -7,7 +7,7 @@ body, .died, .win {
   background-repeat: no-repeat;
 }
 body {
-  background-image: url("../images/backgroundV01.png");
+  background-image: url("../images/backgroundV01.jpg");
 }
 .died, .win {
   width: 100vw;
@@ -15,12 +15,19 @@ body {
   font-size: 92px;
 }
 .died {
-  background-image: url("../images/die.png");
+  background-image: url("../images/die.jpg");
   color: #420202;
   text-shadow: 0 0 10px red;
 }
 .win {
-  background-image: url("../images/win.jpg");
+  background-image: url("../images/win2.jpg");
   color: #7c7607;
   text-shadow: 0 0 10px yellow;
+}
+.questWindow {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  flex-direction: column;
+  background-image: url("../images/mad_bg.jpg");
 }
