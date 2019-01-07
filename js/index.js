@@ -135,7 +135,7 @@ class GameCanvas extends Canvas {
                 this.drawPlayer()
                 checkFin()
                 checkQuest(plrLoc) ?
-                  askQuestion(questions[currentQuestion])
+                  askQuestion(questions[currentQuestion++])
                     : null
             }
             if(
@@ -148,7 +148,7 @@ class GameCanvas extends Canvas {
                 this.drawPlayer()
                 checkFin()
                 checkQuest(plrLoc) ?
-                  askQuestion(questions[currentQuestion])
+                  askQuestion(questions[currentQuestion++])
                     : null
             }
             if(
@@ -161,7 +161,7 @@ class GameCanvas extends Canvas {
                 this.drawPlayer()
                 checkFin()
                 checkQuest(plrLoc) ?
-                  askQuestion(questions[currentQuestion])
+                  askQuestion(questions[currentQuestion++])
                     : null
             }
             if(
@@ -174,7 +174,7 @@ class GameCanvas extends Canvas {
                 this.drawPlayer()
                 checkFin()
                 checkQuest(plrLoc) ?
-                  askQuestion(questions[currentQuestion])
+                  askQuestion(questions[currentQuestion++])
                     : null
             }
         }
@@ -245,14 +245,11 @@ class GameCanvas extends Canvas {
             {
               var check = el.x === currentLoc.x && el.y === currentLoc.y
               check ? arr.splice(ind,1) : null
-              console.log("old currentQuestion", currentQuestion)
-              check ? currentQuestion = ind : null
-              console.log("currentQuestion", currentQuestion, ind)
               return check
             }
           )
         }
-        var currentQuestion
+        var currentQuestion = 0
         var success = () => {
           var oldQuest = document.querySelector(".questWindow")
           Array.from(oldQuest.children).forEach(
@@ -266,6 +263,7 @@ class GameCanvas extends Canvas {
           },2000)
         }
         var askQuestion = arrElem => {
+          console.log("askQuestion",arrElem)
           document.onkeydown = null
           enemyPause = true
           var nQues = this.addElem("div")
