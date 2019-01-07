@@ -245,7 +245,9 @@ class GameCanvas extends Canvas {
             {
               var check = el.x === currentLoc.x && el.y === currentLoc.y
               check ? arr.splice(ind,1) : null
+              console.log("old currentQuestion", currentQuestion)
               check ? currentQuestion = ind : null
+              console.log("currentQuestion", currentQuestion, ind)
               return check
             }
           )
