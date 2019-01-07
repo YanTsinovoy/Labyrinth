@@ -200,7 +200,8 @@ class GameCanvas extends Canvas {
             clearOL(plrLoc, plrSize)//test
             this.drawPlayer()
             document.onkeydown = function(e){
-                plrHis.length === 1 ? enemyStart() : null
+                plrHis.length === 1 && e.keyCode >= 37 && e.keyCode <= 40
+                  ? enemyStart() : null
                 plrMove(e)
             }
         }
@@ -268,11 +269,11 @@ class GameCanvas extends Canvas {
         var askQuestion = arrElem => {
           document.onkeydown = null
           enemyPause = true
-          var mQues = addElem("div")
+          var mQues = this.addElem("div")
           nQues.className = "questWindow"
           arrElem.forEach(
             elem => {
-              var tag = addElem(elem.tagName, nQues)
+              var tag = this.addElem(elem.tagName, nQues)
                     for(var attr in elem.attrs){
                       tag[attr] = elem.attrs[attr]
                     }
