@@ -49,6 +49,7 @@ class GameCanvas extends Canvas {
             rims.y2 = this.canvas.height = height
         }
         var walls = []
+        var questLoc = []
         var questions = []
         var rims = {
             x: 0,
@@ -253,17 +254,17 @@ class GameCanvas extends Canvas {
           this.toggle = false
           drawBuilder(t)
         }
-        var drawCuestion = queLoc => {
+        var drawCuestion = qLoc => {
           this.area.drawImage(queImg, queLoc.x, queLoc.y)
-          questions.push(Object.assign(
-            {}, queLoc
+          questLoc.push(Object.assign(
+            {}, qLoc
           ))
         }
         var setQuestion = () => {
           if(!this.toggle && this.que){
             drawCuestion(bldLoc)
             this.que = false
-            console.log(questions)
+            console.log(questLoc)
           }
         }
         this.drawFinish = () => {
@@ -281,8 +282,24 @@ class GameCanvas extends Canvas {
           gameFin() : null
         }
         var checkQuest = currentLoc => {
-          return questions.some(
-            el => el.x === currentLoc.x && el.y === currentLoc.y
+          return questLoc.some(
+            (el, ind, arr) =>
+            {
+              var check = el.x === currentLoc.x && el.y === currentLoc.y
+              check ? arr.splice(ind,1) : null
+              return check
+            }
+          )
+        }
+        var askQuestion = arrElem => {
+          document.onkeydown = null
+          enemyPause = true
+          var mQues = addElem("div")
+          nQues.className = "questWindow"
+          arrElem.forEach(
+            elem => {
+              
+            }
           )
         }
         this.toggle = false
@@ -303,7 +320,7 @@ class GameCanvas extends Canvas {
                 document.onkeydown = null
                 console.log(JSON.stringify(walls))
                 console.warn("questions")
-                console.log(JSON.stringify(questions))
+                console.log(JSON.stringify(questLoc))
         }
         this.drawLab = () => {
           fetch("json/test.json")
@@ -311,11 +328,16 @@ class GameCanvas extends Canvas {
               .then(resp =>  resp.forEach(
                 el => drawWall(el)
               )))
-          fetch("json/quest.json")
+          fetch("json/queLoc.json")
             .then(response => response.json()
               .then(resp => resp.forEach(
                 el => drawCuestion(el)
               )))
+          fetch("json/questions.json")
+            .then(response => response.json()
+            .then(resp => resp.forEach(
+              el => questions.push(el)
+            )))
         }
         var enmCurPos = 0
         var enemyPause = false
@@ -333,7 +355,6 @@ class GameCanvas extends Canvas {
                   gameOver("YOU DIED", "died")
               }
           }.bind(this),300)
-          return timer
         }
         var enemyStart = () => {
             console.log(this,1)
