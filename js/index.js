@@ -135,7 +135,9 @@ class GameCanvas extends Canvas {
                 plrLoc.y -= plrStep
                 this.drawPlayer()
                 checkFin()
-                checkQuest(plrLoc) ? alert("Q"): null
+                checkQuest(plrLoc) ?
+                  askQuestion(questions[currentQuestion])
+                    : null
             }
             if(
                 event.keyCode == 40
@@ -146,7 +148,9 @@ class GameCanvas extends Canvas {
                 plrLoc.y += plrStep
                 this.drawPlayer()
                 checkFin()
-                checkQuest(plrLoc) ? alert("Q"): null
+                checkQuest(plrLoc) ?
+                  askQuestion(questions[currentQuestion])
+                    : null
             }
             if(
                 event.keyCode == 37
@@ -157,7 +161,9 @@ class GameCanvas extends Canvas {
                 plrLoc.x -= plrStep
                 this.drawPlayer()
                 checkFin()
-                checkQuest(plrLoc) ? alert("Q"): null
+                checkQuest(plrLoc) ?
+                  askQuestion(questions[currentQuestion])
+                    : null
             }
             if(
                 event.keyCode == 39
@@ -168,7 +174,9 @@ class GameCanvas extends Canvas {
                 plrLoc.x += plrStep
                 this.drawPlayer()
                 checkFin()
-                checkQuest(plrLoc) ? alert("Q"): null
+                checkQuest(plrLoc) ?
+                  askQuestion(questions[currentQuestion])
+                    : null
             }
         }
         var plrHis =[]
@@ -239,9 +247,23 @@ class GameCanvas extends Canvas {
             {
               var check = el.x === currentLoc.x && el.y === currentLoc.y
               check ? arr.splice(ind,1) : null
+              check ? currentQuestion = ind : null
               return check
             }
           )
+        }
+        var currentQuestion
+        var success = () => {
+          var oldQuest = document.querySelector(".questWindow")
+          Array.from(oldQuest.children).forEach(
+            el => el.remove()
+          )
+          oldQuest.innerText = "You answered correctly!"
+          setTimeout(function(){
+            oldQuest.remove()
+            document.onkeydown = function(e) { plrMove(e) }
+            enemyPause = false
+          },2000)
         }
         var askQuestion = arrElem => {
           document.onkeydown = null
@@ -250,7 +272,19 @@ class GameCanvas extends Canvas {
           nQues.className = "questWindow"
           arrElem.forEach(
             elem => {
-
+              var tag = addElem(elem.tagName, nQues)
+                    for(var attr in elem.attrs){
+                      tag[attr] = elem.attrs[attr]
+                    }
+                    elem.answers ?
+                      tag.onclick = function(event){
+                        document.querySelectorAll("span")[0].innerText === el.answers[0]
+                        && document.querySelectorAll("span")[1].innerText === el.answers[1]
+                        && document.querySelectorAll("span")[2].innerText === el.answers[2]
+                        ? success ()
+                        : gameOver("YOU DIED", "died")
+                      }
+                    : null
             }
           )
         }
@@ -335,12 +369,11 @@ class GameCanvas extends Canvas {
               .then(resp => resp.forEach(
                 el => drawCuestion(el)
               )))
-              // Добавить при создании базы данных
-          // fetch("json/questions.json")
-          //   .then(response => response.json()
-          //   .then(resp => resp.forEach(
-          //     el => questions.push(el)
-          //   )))
+          fetch("json/questions.json")
+            .then(response => response.json()
+            .then(resp => resp.forEach(
+              el => questions.push(el)
+            )))
         }
         var enmCurPos = 0
         var enemyPause = false
