@@ -219,9 +219,6 @@ class GameCanvas extends Canvas {
             {}, qLoc
           ))
         }
-        var removeQuestion = () => {
-
-        }
         this.drawFinish = () => {
           this.area.beginPath()
           this.area.drawImage(finImg, finishLoc.x, finishLoc.y)
@@ -242,8 +239,6 @@ class GameCanvas extends Canvas {
             {
               var check = el.x === currentLoc.x && el.y === currentLoc.y
               check ? arr.splice(ind,1) : null
-              console.warn("splice question")
-              console.log(arr.length)
               return check
             }
           )
@@ -340,11 +335,12 @@ class GameCanvas extends Canvas {
               .then(resp => resp.forEach(
                 el => drawCuestion(el)
               )))
-          fetch("json/questions.json")
-            .then(response => response.json()
-            .then(resp => resp.forEach(
-              el => questions.push(el)
-            )))
+              // Добавить при создании базы данных
+          // fetch("json/questions.json")
+          //   .then(response => response.json()
+          //   .then(resp => resp.forEach(
+          //     el => questions.push(el)
+          //   )))
         }
         var enmCurPos = 0
         var enemyPause = false
