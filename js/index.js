@@ -279,9 +279,12 @@ class GameCanvas extends Canvas {
                     }
                     elem.answers ?
                       tag.onclick = function(event){
-                        document.querySelectorAll("span")[0].innerText === el.answers[0]
-                        && document.querySelectorAll("span")[1].innerText === el.answers[1]
-                        && document.querySelectorAll("span")[2].innerText === el.answers[2]
+                        document.querySelectorAll("span")[0]
+                          .innerText === elem.answers[0]
+                        && document.querySelectorAll("span")[1]
+                          .innerText === elem.answers[1]
+                        && document.querySelectorAll("span")[2]
+                          .innerText === elem.answers[2]
                         ? success ()
                         : gameOver("YOU DIED", "died")
                       }
