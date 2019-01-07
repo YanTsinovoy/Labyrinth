@@ -2,7 +2,7 @@ body, .died, .win, .questWindow {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-size: cover;
+  background-size: 100%;
   background-position: center;
   background-repeat: no-repeat;
 }
@@ -26,8 +26,9 @@ body {
 }
 .questWindow {
   position: absolute;
-  width: 50vw;
-  height: 50vh;
+  /* width: 50vw;
+  height: 50vh; */
   flex-direction: column;
   background-image: url("../images/mad_bg.jpg");
+  color: white;
 }

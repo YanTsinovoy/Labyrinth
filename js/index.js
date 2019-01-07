@@ -95,7 +95,6 @@ class GameCanvas extends Canvas {
                 })
         }
         var limiter = (persC,persS, func) => {
-                console.log(func.name)
                 if(walls.length) return !func(persC,persS)
                 return true
         }
@@ -187,8 +186,6 @@ class GameCanvas extends Canvas {
             x:0, y:0
         }
         this.drawPlayer = () => {
-            console.log("draw")
-            console.log(this.area)
             this.area.beginPath()//test
             this.area.drawImage (plrImg, plrLoc.x, plrLoc.y)
             plrHis.push (
@@ -297,7 +294,6 @@ class GameCanvas extends Canvas {
         this.que = false
         var stepBackward = t => {
           walls.pop()
-          console.log(walls.length,"stepBacward")
           clearOL(bldLoc, plrSize)
           var l = walls.length
           l ? bldLoc.x = walls[l-1].x : null
@@ -320,7 +316,6 @@ class GameCanvas extends Canvas {
           if(!this.toggle && this.que){
             drawCuestion(bldLoc)
             this.que = false
-            console.log(questLoc)
           }
         }
         this.finBuilder = () => {
@@ -331,7 +326,6 @@ class GameCanvas extends Canvas {
                 console.log(JSON.stringify(questLoc))
         }
         var moveBld = (event, t) => {
-            console.log(this)
             if(
                 event.keyCode == 38
                 && bldLoc.y !== rims.y
@@ -383,7 +377,6 @@ class GameCanvas extends Canvas {
         var enemyPause = false
         var enemyMove = () => {
           var timer = setInterval(function(){
-              console.log(this)
               clearOL(plrHis[enmCurPos], plrSize)
               !enemyPause ? enmCurPos++ : null
               this.area.drawImage(enmImg, plrHis[enmCurPos].x, plrHis[enmCurPos].y)
@@ -397,14 +390,14 @@ class GameCanvas extends Canvas {
           }.bind(this),300)
         }
         var enemyStart = () => {
-            console.log(this,1)
             setTimeout( function() {
-                console.log(this,2)
                 this.area.drawImage (enmImg, plrHis[0].x, plrHis[0].y)
                 enemyMove()
             }.bind(this), 5000 )
         }
         var gameOver = (endText, endClass) => {
+            var oldQuest = document.querySelector(".questWindow")
+            oldQuest? oldQuest.remove() : null
             enemyPause = true
             document.onkeydown = null
             this.canvas.remove()
