@@ -137,6 +137,9 @@ class GameCanvas extends Canvas {
                 checkQuest(plrLoc) ?
                   askQuestion(questions[currentQuestion++])
                     : null
+                checkEnemy(plrLoc, plrHis[enmCurPos]) ?
+                  gameOver("YOU DIED", "died")
+                    : null
             }
             if(
                 event.keyCode == 40
@@ -149,6 +152,9 @@ class GameCanvas extends Canvas {
                 checkFin()
                 checkQuest(plrLoc) ?
                   askQuestion(questions[currentQuestion++])
+                    : null
+                checkEnemy(plrLoc, plrHis[enmCurPos]) ?
+                  gameOver("YOU DIED", "died")
                     : null
             }
             if(
@@ -163,6 +169,9 @@ class GameCanvas extends Canvas {
                 checkQuest(plrLoc) ?
                   askQuestion(questions[currentQuestion++])
                     : null
+                checkEnemy(plrLoc, plrHis[enmCurPos]) ?
+                  gameOver("YOU DIED", "died")
+                    : null
             }
             if(
                 event.keyCode == 39
@@ -175,6 +184,9 @@ class GameCanvas extends Canvas {
                 checkFin()
                 checkQuest(plrLoc) ?
                   askQuestion(questions[currentQuestion++])
+                    : null
+                checkEnemy(plrLoc, plrHis[enmCurPos]) ?
+                  gameOver("YOU DIED", "died")
                     : null
             }
         }
@@ -263,7 +275,8 @@ class GameCanvas extends Canvas {
           },2000)
         }
         var askQuestion = arrElem => {
-          console.log("askQuestion",arrElem)
+          currentQuestion === questions.length - 1 ?
+            currentQuestion = 0 : null
           document.onkeydown = null
           enemyPause = true
           var nQues = this.addElem("div")
@@ -373,6 +386,10 @@ class GameCanvas extends Canvas {
               el => questions.push(el)
             )))
         }
+        var checkEnemy = (pLoc, eLoc) => {
+          var check = pLoc.x === eLoc.x && pLoc.y === eLoc.y
+          return check
+        }
         var enmCurPos = 0
         var enemyPause = false
         var enemyMove = () => {
@@ -396,8 +413,10 @@ class GameCanvas extends Canvas {
             }.bind(this), 5000 )
         }
         var gameOver = (endText, endClass) => {
+            var oldOver = document.querySelector("." + endClass)
+            oldOver ? oldOver.remove() : null
             var oldQuest = document.querySelector(".questWindow")
-            oldQuest? oldQuest.remove() : null
+            oldQuest ? oldQuest.remove() : null
             enemyPause = true
             document.onkeydown = null
             this.canvas.remove()
