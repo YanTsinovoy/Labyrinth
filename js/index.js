@@ -213,6 +213,90 @@ class GameCanvas extends Canvas {
             toggle ? walls.push(bld)
                 : console.log(toggle)
         }
+        var drawCuestion = qLoc => {
+          this.area.drawImage(queImg, queLoc.x, queLoc.y)
+          questLoc.push(Object.assign(
+            {}, qLoc
+          ))
+        }
+        var removeQuestion = () => {
+
+        }
+        this.drawFinish = () => {
+          this.area.beginPath()
+          this.area.drawImage(finImg, finishLoc.x, finishLoc.y)
+          this.area.closePath()
+        }
+        var gameFin = () => {
+          clearOL(plrLoc, plrSize)
+          this.drawFinish()
+          setTimeout(function(){gameOver("YOU WON", "win")}.bind(this),500)
+        }
+        var checkFin = () => {
+          plrLoc.x === finishLoc.x && plrLoc.y === finishLoc.y ?
+          gameFin() : null
+        }
+        var checkQuest = currentLoc => {
+          return questLoc.some(
+            (el, ind, arr) =>
+            {
+              var check = el.x === currentLoc.x && el.y === currentLoc.y
+              check ? arr.splice(ind,1) : null
+              console.warn("splice question")
+              console.log(arr.length)
+              return check
+            }
+          )
+        }
+        var askQuestion = arrElem => {
+          document.onkeydown = null
+          enemyPause = true
+          var mQues = addElem("div")
+          nQues.className = "questWindow"
+          arrElem.forEach(
+            elem => {
+
+            }
+          )
+        }
+        // Функционал для создания лабиринта start
+        this.toggle = false
+        this.que = false
+        var stepBackward = t => {
+          walls.pop()
+          console.log(walls.length,"stepBacward")
+          clearOL(bldLoc, plrSize)
+          var l = walls.length
+          l ? bldLoc.x = walls[l-1].x : null
+          l ? bldLoc.y = walls[l-1].y : null
+          this.toggle = false
+          drawBuilder(t)
+        }
+        this.startBuilder = () => {
+          drawBuilder()
+          document.onkeydown = e => {
+                  console.log(this.toggle)
+                  e.keyCode == 17 ? this.toggle = true
+                  : e.keyCode == 16 ? this.toggle = false
+                  : e.keyCode == 226 ? stepBackward(this.toggle)
+                  : e.keyCode == 90 ? this.que = true
+                  : moveBld(e,this.toggle)
+          }
+        }
+        var setQuestion = () => {
+          if(!this.toggle && this.que){
+            drawCuestion(bldLoc)
+            this.que = false
+            console.log(questLoc)
+          }
+        }
+        this.finBuilder = () => {
+                clearOL(bldLoc, plrSize)
+                document.onkeydown = null
+                console.log(JSON.stringify(walls))
+                console.warn("questions")
+                console.log(JSON.stringify(questLoc))
+        }
         var moveBld = (event, t) => {
             console.log(this)
             if(
@@ -244,84 +328,7 @@ class GameCanvas extends Canvas {
                 drawBuilder(t)
             }
         }
-        var stepBackward = t => {
-          walls.pop()
-          console.log(walls.length,"stepBacward")
-          clearOL(bldLoc, plrSize)
-          var l = walls.length
-          l ? bldLoc.x = walls[l-1].x : null
-          l ? bldLoc.y = walls[l-1].y : null
-          this.toggle = false
-          drawBuilder(t)
-        }
-        var drawCuestion = qLoc => {
-          this.area.drawImage(queImg, queLoc.x, queLoc.y)
-          questLoc.push(Object.assign(
-            {}, qLoc
-          ))
-        }
-        var setQuestion = () => {
-          if(!this.toggle && this.que){
-            drawCuestion(bldLoc)
-            this.que = false
-            console.log(questLoc)
-          }
-        }
-        this.drawFinish = () => {
-          this.area.beginPath()
-          this.area.drawImage(finImg, finishLoc.x, finishLoc.y)
-          this.area.closePath()
-        }
-        var gameFin = () => {
-          clearOL(plrLoc, plrSize)
-          this.drawFinish()
-          setTimeout(function(){gameOver("YOU WON", "win")}.bind(this),500)
-        }
-        var checkFin = () => {
-          plrLoc.x === finishLoc.x && plrLoc.y === finishLoc.y ?
-          gameFin() : null
-        }
-        var checkQuest = currentLoc => {
-          return questLoc.some(
-            (el, ind, arr) =>
-            {
-              var check = el.x === currentLoc.x && el.y === currentLoc.y
-              check ? arr.splice(ind,1) : null
-              return check
-            }
-          )
-        }
-        var askQuestion = arrElem => {
-          document.onkeydown = null
-          enemyPause = true
-          var mQues = addElem("div")
-          nQues.className = "questWindow"
-          arrElem.forEach(
-            elem => {
-              
-            }
-          )
-        }
-        this.toggle = false
-        this.que = false
-        this.startBuilder = () => {
-          drawBuilder()
-          document.onkeydown = e => {
-                  console.log(this.toggle)
-                  e.keyCode == 17 ? this.toggle = true
-                  : e.keyCode == 16 ? this.toggle = false
-                  : e.keyCode == 226 ? stepBackward(this.toggle)
-                  : e.keyCode == 90 ? this.que = true
-                  : moveBld(e,this.toggle)
-          }
-        }
-        this.finBuilder = () => {
-                clearOL(bldLoc, plrSize)
-                document.onkeydown = null
-                console.log(JSON.stringify(walls))
-                console.warn("questions")
-                console.log(JSON.stringify(questLoc))
-        }
+      // end
         this.drawLab = () => {
           fetch("json/test.json")
             .then(response => response.json()
