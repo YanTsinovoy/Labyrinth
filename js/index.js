@@ -214,7 +214,7 @@ class GameCanvas extends Canvas {
                 : console.log(toggle)
         }
         var drawCuestion = qLoc => {
-          this.area.drawImage(queImg, queLoc.x, queLoc.y)
+          this.area.drawImage(queImg, qLoc.x, qLoc.y)
           questLoc.push(Object.assign(
             {}, qLoc
           ))
