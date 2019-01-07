@@ -269,7 +269,7 @@ class GameCanvas extends Canvas {
         var askQuestion = arrElem => {
           document.onkeydown = null
           enemyPause = true
-          var mQues = this.addElem("div")
+          var nQues = this.addElem("div")
           nQues.className = "questWindow"
           arrElem.forEach(
             elem => {
