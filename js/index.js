@@ -281,7 +281,7 @@ class GameCanvas extends Canvas {
           )
         }
         var currentQuestion = 0
-        var success = () => {e
+        var success = () => {
           fonAudio.play()
           var oldQuest = document.querySelector(".questWindow")
           Array.from(oldQuest.children).forEach(
