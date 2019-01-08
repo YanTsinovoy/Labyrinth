@@ -30,8 +30,8 @@ body, .died, .win, .questWindow, .parent {
 }
 .questWindow {
   position: absolute;
-  /* width: 50vw;
-  height: 50vh; */
+  width: 50vw;
+  height: 50vh;
   flex-direction: column;
   background-image: url("../images/mad_bg.jpg");
   color: white;
