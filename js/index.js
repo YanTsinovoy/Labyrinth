@@ -6,7 +6,8 @@ class Canvas {
             document.createElement(tagName)
           )
         }
-        this.canvas = this.addElem("canvas")
+        this.parent = document.querySelector(".parent")
+        this.canvas = this.addElem("canvas", this.parent)
         this.area = this.canvas.getContext ( "2d" )
         this.setStyle = (propName,propValue) => {
             this.canvas.style[propName] = propValue
@@ -98,6 +99,18 @@ class GameCanvas extends Canvas {
                 if(walls.length) return !func(persC,persS)
                 return true
         }
+
+        var stepAudio = new Audio()
+        stepAudio.src = "audio/step.mp3"
+        var screamAudio = new Audio()
+        screamAudio.src = "audio/die_scream.mp3"
+        var questAudio = new Audio()
+        questAudio.src = "audio/quest.mp3"
+        var winAudio = new Audio()
+        winAudio.src = "audio/win.mp3"
+        var fonAudio = new Audio()
+        fonAudio.src = "audio/podzem.mp3"
+
         var plrImg = new Image()
         plrImg.src = "images/pers.png"
         var enmImg = new Image()
@@ -106,6 +119,7 @@ class GameCanvas extends Canvas {
         queImg.src = "images/quest.png"
         var finImg = new Image()
         finImg.src = "images/finish.png"
+
         var finishLoc = {
             x: 976,
             y: 480
@@ -123,6 +137,7 @@ class GameCanvas extends Canvas {
             this.area.clearRect(x, y, w, h)
         }
         var plrMove = event => {
+            fonAudio.play()
             var oldLoc = plrHis[plrHis.length -1]
             // Избавиться от if-ов
             if(
@@ -132,13 +147,14 @@ class GameCanvas extends Canvas {
             ){
                 clearOL ( oldLoc, plrSize )
                 plrLoc.y -= plrStep
+                stepAudio.play()
                 this.drawPlayer()
                 checkFin()
                 checkQuest(plrLoc) ?
                   askQuestion(questions[currentQuestion++])
                     : null
                 checkEnemy(plrLoc, plrHis[enmCurPos]) ?
-                  gameOver("YOU DIED", "died")
+                  gameOver("YOU DIED", "died", screamAudio)
                     : null
             }
             if(
@@ -148,13 +164,14 @@ class GameCanvas extends Canvas {
             ){
                 clearOL ( oldLoc, plrSize )
                 plrLoc.y += plrStep
+                stepAudio.play()
                 this.drawPlayer()
                 checkFin()
                 checkQuest(plrLoc) ?
                   askQuestion(questions[currentQuestion++])
                     : null
                 checkEnemy(plrLoc, plrHis[enmCurPos]) ?
-                  gameOver("YOU DIED", "died")
+                  gameOver("YOU DIED", "died", screamAudio)
                     : null
             }
             if(
@@ -164,13 +181,14 @@ class GameCanvas extends Canvas {
             ){
                 clearOL ( oldLoc, plrSize )
                 plrLoc.x -= plrStep
+                stepAudio.play()
                 this.drawPlayer()
                 checkFin()
                 checkQuest(plrLoc) ?
                   askQuestion(questions[currentQuestion++])
                     : null
                 checkEnemy(plrLoc, plrHis[enmCurPos]) ?
-                  gameOver("YOU DIED", "died")
+                  gameOver("YOU DIED", "died", screamAudio)
                     : null
             }
             if(
@@ -180,13 +198,14 @@ class GameCanvas extends Canvas {
             ){
                 clearOL ( oldLoc, plrSize )
                 plrLoc.x += plrStep
+                stepAudio.play()
                 this.drawPlayer()
                 checkFin()
                 checkQuest(plrLoc) ?
                   askQuestion(questions[currentQuestion++])
                     : null
                 checkEnemy(plrLoc, plrHis[enmCurPos]) ?
-                  gameOver("YOU DIED", "died")
+                  gameOver("YOU DIED", "died", screamAudio)
                     : null
             }
         }
@@ -245,7 +264,7 @@ class GameCanvas extends Canvas {
         var gameFin = () => {
           clearOL(plrLoc, plrSize)
           this.drawFinish()
-          setTimeout(function(){gameOver("YOU WON", "win")}.bind(this),500)
+          setTimeout(function(){gameOver("YOU WON", "win", winAudio)}.bind(this),500)
         }
         var checkFin = () => {
           plrLoc.x === finishLoc.x && plrLoc.y === finishLoc.y ?
@@ -262,7 +281,8 @@ class GameCanvas extends Canvas {
           )
         }
         var currentQuestion = 0
-        var success = () => {
+        var success = () => {e
+          fonAudio.play()
           var oldQuest = document.querySelector(".questWindow")
           Array.from(oldQuest.children).forEach(
             el => el.remove()
@@ -275,10 +295,12 @@ class GameCanvas extends Canvas {
           },2000)
         }
         var askQuestion = arrElem => {
+          fonAudio.pause()
           currentQuestion === questions.length - 1 ?
             currentQuestion = 0 : null
           document.onkeydown = null
           enemyPause = true
+          questAudio.play()
           var nQues = this.addElem("div")
           nQues.className = "questWindow"
           arrElem.forEach(
@@ -296,7 +318,7 @@ class GameCanvas extends Canvas {
                         && document.querySelectorAll("span")[2]
                           .innerText === elem.answers[2]
                         ? success ()
-                        : gameOver("YOU DIED", "died")
+                        : gameOver("YOU DIED", "died", screamAudio)
                       }
                     : null
             }
@@ -393,6 +415,7 @@ class GameCanvas extends Canvas {
         var enmCurPos = 0
         var enemyPause = false
         var enemyMove = () => {
+          fonAudio.ended ? fonAudio.play() : null
           var timer = setInterval(function(){
               clearOL(plrHis[enmCurPos], plrSize)
               !enemyPause ? enmCurPos++ : null
@@ -402,7 +425,7 @@ class GameCanvas extends Canvas {
                   && plrHis[enmCurPos].y === plrLoc.y
               ){
                   clearInterval(timer)
-                  gameOver("YOU DIED", "died")
+                  gameOver("YOU DIED", "died", screamAudio)
               }
           }.bind(this),300)
         }
@@ -412,7 +435,9 @@ class GameCanvas extends Canvas {
                 enemyMove()
             }.bind(this), 5000 )
         }
-        var gameOver = (endText, endClass) => {
+        var gameOver = (endText, endClass, audio) => {
+            fonAudio.pause()
+            audio instanceof Audio && audio? audio.play() : null
             var oldOver = document.querySelector("." + endClass)
             oldOver ? oldOver.remove() : null
             var oldQuest = document.querySelector(".questWindow")
@@ -420,7 +445,7 @@ class GameCanvas extends Canvas {
             enemyPause = true
             document.onkeydown = null
             this.canvas.remove()
-            var over = this.addElem("div")
+            var over = this.addElem("div", this.parent)
             over.className = endClass
             var mess = this.addElem("div", over)
             mess.innerText = endText
@@ -432,8 +457,7 @@ class GameCanvas extends Canvas {
         }
     }
 }
-
-var game = new GameCanvas()
+var game = new GameCanvas(parent)
 game.setSize(992, 496)
 game.setStyle("background","#92959baa")
 game.setStyle("marginTop", "2vw")
