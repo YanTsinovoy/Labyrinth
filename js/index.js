@@ -108,8 +108,30 @@ class GameCanvas extends Canvas {
         questAudio.src = "audio/quest.mp3"
         var winAudio = new Audio()
         winAudio.src = "audio/win.mp3"
-        var fonAudio = new Audio()
-        fonAudio.src = "audio/podzem.mp3"
+        this.fonAudio = new Audio()
+        this.fonAudio.src = "audio/podzem.mp3"
+        this.fonAudioToggle = true
+
+        this.mPauseBtn = this.addElem("div", this.parent)
+        this.mPauseBtn.className = "mpouse"
+        this.mPauseBtn.innerHTML = "Pause music"
+        this.mPauseBtn.onclick = function(event){
+          if(this.fonAudioToggle){
+            this.fonAudio.pause()
+            this.fonAudioToggle = false
+          } else {
+            this.fonAudio.play()
+            this.fonAudioToggle = true
+          }
+        }.bind(this)
+
+        this.gamePauseBtn = this.addElem("div", this.parent)
+        this.gamePauseBtn.className = "gpouse"
+        this.gamePauseBtn.innerHTML = "Pause game"
+        this.gamePauseBtn.onclick = function(event){
+            document.onkeydown ? document.onkeydown = null : this.playerStart()
+            !enemyPause ? enemyPause = true : enemyPause = false
+        }.bind(this)
 
         var plrImg = new Image()
         plrImg.src = "images/pers.png"
@@ -137,7 +159,6 @@ class GameCanvas extends Canvas {
             this.area.clearRect(x, y, w, h)
         }
         var plrMove = event => {
-            fonAudio.play()
             var oldLoc = plrHis[plrHis.length -1]
             // Избавиться от if-ов
             if(
@@ -228,7 +249,7 @@ class GameCanvas extends Canvas {
             clearOL(plrLoc, plrSize)//test
             this.drawPlayer()
             document.onkeydown = function(e){
-                plrHis.length === 1 && e.keyCode >= 37 && e.keyCode <= 40
+                plrHis.length >= 1 && !enmStarted && e.keyCode >= 37 && e.keyCode <= 40
                   ? enemyStart() : null
                 plrMove(e)
             }
@@ -251,10 +272,12 @@ class GameCanvas extends Canvas {
                 : console.log(toggle)
         }
         var drawCuestion = qLoc => {
+          this.area.beginPath()
           this.area.drawImage(queImg, qLoc.x, qLoc.y)
           questLoc.push(Object.assign(
             {}, qLoc
           ))
+          this.area.closePath()
         }
         this.drawFinish = () => {
           this.area.beginPath()
@@ -282,7 +305,7 @@ class GameCanvas extends Canvas {
         }
         var currentQuestion = 0
         var success = () => {
-          fonAudio.play()
+          this.fonAudio.play()
           var oldQuest = document.querySelector(".questWindow")
           Array.from(oldQuest.children).forEach(
             el => el.remove()
@@ -295,7 +318,7 @@ class GameCanvas extends Canvas {
           },2000)
         }
         var askQuestion = arrElem => {
-          fonAudio.pause()
+          this.fonAudio.pause()
           currentQuestion === questions.length - 1 ?
             currentQuestion = 0 : null
           document.onkeydown = null
@@ -328,6 +351,7 @@ class GameCanvas extends Canvas {
         this.toggle = false
         this.que = false
         var stepBackward = t => {
+          console.log("stepBackward")
           walls.pop()
           clearOL(bldLoc, plrSize)
           var l = walls.length
@@ -338,13 +362,15 @@ class GameCanvas extends Canvas {
         }
         this.startBuilder = () => {
           drawBuilder()
+          this.drawFinish()
           document.onkeydown = e => {
-                  console.log(this.toggle)
+                  console.log(e.keyCode)
                   e.keyCode == 17 ? this.toggle = true
                   : e.keyCode == 16 ? this.toggle = false
-                  : e.keyCode == 226 ? stepBackward(this.toggle)
+                  : e.keyCode == 226 || e.keyCode == 220 ? stepBackward(this.toggle)
                   : e.keyCode == 90 ? this.que = true
                   : moveBld(e,this.toggle)
+                  e.keyCode == 27 ? this.finBuilder() : null
           }
         }
         var setQuestion = () => {
@@ -356,9 +382,9 @@ class GameCanvas extends Canvas {
         this.finBuilder = () => {
                 clearOL(bldLoc, plrSize)
                 document.onkeydown = null
-                console.log(JSON.stringify(walls))
+                localStorage.setItem("Local_Lab",JSON.stringify(walls))
                 console.warn("questions")
-                console.log(JSON.stringify(questLoc))
+                localStorage.setItem("Local_questions",JSON.stringify(questLoc))
         }
         var moveBld = (event, t) => {
             if(
@@ -408,14 +434,41 @@ class GameCanvas extends Canvas {
               el => questions.push(el)
             )))
         }
+        this.startAll= async function(){
+            await this.drawLab()
+            this.playerStart()
+            this.drawFinish()
+        }
+        this.loadLab = () => {
+          var localeWalls = JSON.parse(localStorage.getItem("Local_Lab"))
+          localeWalls.forEach( el => {
+            drawWall(el)
+            if(localeWalls.length === walls.length){
+              console.log("drawQuestions")
+              var queLocs = JSON.parse(localStorage.getItem("Local_questions"))
+              queLocs.forEach(elem => drawCuestion(elem))
+            }
+          })
+        }
+        this.startLocale = async function(){
+          await fetch("json/questions.json")
+            .then(response => response.json()
+            .then(resp => resp.forEach(
+              el => questions.push(el)
+            )))
+          this.loadLab()
+          this.playerStart()
+          this.drawFinish()
+        }
         var checkEnemy = (pLoc, eLoc) => {
           var check = pLoc.x === eLoc.x && pLoc.y === eLoc.y
           return check
         }
         var enmCurPos = 0
+        var enmStarted = false
         var enemyPause = false
         var enemyMove = () => {
-          fonAudio.ended ? fonAudio.play() : null
+          this.fonAudio.ended ? this.fonAudio.play() : null
           var timer = setInterval(function(){
               clearOL(plrHis[enmCurPos], plrSize)
               !enemyPause ? enmCurPos++ : null
@@ -430,13 +483,16 @@ class GameCanvas extends Canvas {
           }.bind(this),300)
         }
         var enemyStart = () => {
+            enmStarted = true
             setTimeout( function() {
                 this.area.drawImage (enmImg, plrHis[0].x, plrHis[0].y)
                 enemyMove()
             }.bind(this), 5000 )
         }
         var gameOver = (endText, endClass, audio) => {
-            fonAudio.pause()
+            this.fonAudio.pause()
+            this.gamePauseBtn.style.display = "none"
+            this.mPauseBtn.style.display = "none"
             audio instanceof Audio && audio? audio.play() : null
             var oldOver = document.querySelector("." + endClass)
             oldOver ? oldOver.remove() : null
@@ -450,18 +506,39 @@ class GameCanvas extends Canvas {
             var mess = this.addElem("div", over)
             mess.innerText = endText
         }
-        this.startAll= async function(){
-            await game.drawLab()
-            game.playerStart()
-            game.drawFinish()
-        }
     }
 }
-var game = new GameCanvas(parent)
+let game = new GameCanvas(parent)
 game.setSize(992, 496)
 game.setStyle("background","#92959baa")
 game.setStyle("marginTop", "2vw")
-window.onload = function(event){
+game.setStyle("display", "none")
+game.mPauseBtn.style.display ="none"
+game.gamePauseBtn.style.display ="none"
+document.getElementById("start").onclick = function(event){
+  event.target.parentNode.style.display = "none"
+  game.fonAudio.play()
+  game.setStyle("display", "block")
+  game.mPauseBtn.style.display = "block"
+  game.gamePauseBtn.style.display ="block"
   game.startAll()
 }
+document.getElementById("create").onclick = function(event){
+  event.target.parentNode.style.display = "none"
+  game.mPauseBtn.style.display = "block"
+  game.fonAudio.play()
+  game.setStyle("display", "block")
+  game.startBuilder()
+}
+document.getElementById("pyg").onclick = function(event){
+  event.target.parentNode.style.display = "none"
+  game.fonAudio.play()
+  game.setStyle("display", "block")
+  game.mPauseBtn.style.display = "block"
+  game.gamePauseBtn.style.display ="block"
+  game.startLocale()
+}
+// window.onload = function(event){
+//   game.startAll()
+// }
 // game.startBuilder()
