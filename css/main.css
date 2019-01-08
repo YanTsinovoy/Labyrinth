@@ -1,13 +1,16 @@
-body, .died, .win, .questWindow {
+body, .died, .win, .questWindow, .parent {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-size: 100%;
+  background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
 }
-body {
+.parent {
   background-image: url("../images/backgroundV01.jpg");
+  width: 100vw;
+  height: 100vh;
+  position: relative;
 }
 .died, .win {
   width: 100vw;
