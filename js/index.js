@@ -128,8 +128,17 @@ class GameCanvas extends Canvas {
         this.gamePauseBtn = this.addElem("div", this.parent)
         this.gamePauseBtn.className = "gpouse"
         this.gamePauseBtn.innerHTML = "Pause game"
+        var pauseLogo = this.addElem("div", this.parent)
+        pauseLogo.className = "pauseLogo"
+        pauseLogo.style.display = "none"
         this.gamePauseBtn.onclick = function(event){
-            document.onkeydown ? document.onkeydown = null : this.playerStart()
+            if(document.onkeydown){
+              document.onkeydown = null
+              pauseLogo.style.display = "block"
+            } else {
+              this.playerStart()
+              pauseLogo.style.display = "none"
+            }
             !enemyPause ? enemyPause = true : enemyPause = false
         }.bind(this)
 
@@ -271,7 +280,7 @@ class GameCanvas extends Canvas {
             toggle ? walls.push(bld)
                 : console.log(toggle)
         }
-        var drawCuestion = qLoc => {
+        var drawQuestion = qLoc => {
           this.area.beginPath()
           this.area.drawImage(queImg, qLoc.x, qLoc.y)
           questLoc.push(Object.assign(
@@ -367,7 +376,7 @@ class GameCanvas extends Canvas {
                   console.log(e.keyCode)
                   e.keyCode == 17 ? this.toggle = true
                   : e.keyCode == 16 ? this.toggle = false
-                  : e.keyCode == 226 || e.keyCode == 220 ? stepBackward(this.toggle)
+                  : e.keyCode == 20 ? stepBackward(this.toggle)
                   : e.keyCode == 90 ? this.que = true
                   : moveBld(e,this.toggle)
                   e.keyCode == 27 ? this.finBuilder() : null
@@ -375,7 +384,7 @@ class GameCanvas extends Canvas {
         }
         var setQuestion = () => {
           if(!this.toggle && this.que){
-            drawCuestion(bldLoc)
+            drawQuestion(bldLoc)
             this.que = false
           }
         }
@@ -426,7 +435,7 @@ class GameCanvas extends Canvas {
           fetch("json/queLoc.json")
             .then(response => response.json()
               .then(resp => resp.forEach(
-                el => drawCuestion(el)
+                el => drawQuestion(el)
               )))
           fetch("json/questions.json")
             .then(response => response.json()
@@ -446,7 +455,7 @@ class GameCanvas extends Canvas {
             if(localeWalls.length === walls.length){
               console.log("drawQuestions")
               var queLocs = JSON.parse(localStorage.getItem("Local_questions"))
-              queLocs.forEach(elem => drawCuestion(elem))
+              queLocs.forEach(elem => drawQuestion(elem))
             }
           })
         }
@@ -537,6 +546,18 @@ document.getElementById("pyg").onclick = function(event){
   game.mPauseBtn.style.display = "block"
   game.gamePauseBtn.style.display ="block"
   game.startLocale()
+}
+document.getElementById("ctr").onclick = function(event){
+  document.querySelector(".game_menu").style.display = "none"
+  document.querySelector(".cont").style.display = "flex"
+  var btnBack = game.addElem("div",document.querySelector(".parent") )
+  btnBack.innerText = "Back to menu"
+  btnBack.className = "btn"
+  btnBack.id = "back_btn"
+  btnBack.onclick = function(event){
+    event.target.remove()
+    document.location.reload()
+  }
 }
 // window.onload = function(event){
 //   game.startAll()
