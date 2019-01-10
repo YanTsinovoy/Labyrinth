@@ -51,7 +51,7 @@ body, .died, .win, .questWindow, .parent {
   padding: 0;
   cursor: pointer;
   outline: 0;
-  margin: 50px;
+  margin: 30px;
   -webkit-appearance: none;
 }
 
@@ -81,7 +81,6 @@ body, .died, .win, .questWindow, .parent {
 .btn:hover, .mpouse:hover, .gpouse:hover {
   top: -10px;
   box-shadow: 0px 10px 10px rgba( 15, 165, 60, 0.2 );
-
   -webkit-transform: rotateX(20deg);
      -moz-transform: rotateX(20deg);
       -ms-transform: rotateX(20deg);
@@ -93,14 +92,14 @@ body, .died, .win, .questWindow, .parent {
   background: rgba( 20, 224, 133, 1 );
 }
 .mpouse:hover, .gpouse:hover {
-  top: 25px;
+  top: 10px;
 }
 .mpouse:active, .gpouse:active {
-  top: 30px;
+  top: 15px;
 }
 .mpouse, .gpouse {
   position: fixed;
-  top: 30px;
+  top: 15px;
   font-size: 24px;
   padding: 10px 19px;
 }
@@ -109,4 +108,110 @@ body, .died, .win, .questWindow, .parent {
 }
 .gpouse {
   left: 30px;
+}
+#back_btn {
+  position: fixed;
+  left: 0;
+  top: 20px;
+}
+.pauseLogo {
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  display: block;
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  background: #00000090;
+  transform: translate(-50%, -50%);
+}
+.pauseLogo::after {
+  width: 300px;
+  height: 200px;
+  content: "";
+  position: absolute;
+  left: 75px;
+  top: 50px;
+  border-style: double;
+  border-color: #ffffffaa;
+  border-width: 0px 0px 0px 150px;
+  box-sizing: border-box;
+}
+
+.cont, .button_table, .arrows {
+   display: flex;
+   justify-content: center;
+   user-select: none;
+}
+.cont {
+  display: none;
+  width:100vw;
+  height: 100vh;
+  background: black;
+  align-items: center;
+  color: #adadad;
+  font-size: 32px;
+}
+.button_table {
+  flex-direction: column;
+  margin: 50px;
+}
+.arrows {
+  align-items: center;
+
+}
+.key_help {
+  text-align: right;
+  font-size: 20px;
+  transition: all 0.5s;
+}
+.key{
+  font-size: 18px;
+  width: 30px;
+  height: 40px;
+  display:block;
+  background-color:#333;
+  text-align: left;
+  padding-left: 8px;
+  line-height: 29px;
+  border-radius:2px;
+  float:left;
+  margin: 2px 20px 2px 0;
+  cursor: pointer;
+  transition: box-shadow 0.7s ease;
+}
+.key:hover{
+  box-shadow:0px 0px 10px #14e085aa;
+}
+.key_help:hover{
+  color: green;
+}
+#esc {
+  width: 30px;
+  font-size:14px;
+}
+#shift {
+  width: 40px;
+  font-size:14px;
+}
+#caps {
+  width:70px;
+  font-size:14px;
+  line-height:18px;
+}
+#ctrl {
+  width: 35px;
+  line-height: 40px;
+  font-size:13px;
+}
+.arrows .key {
+  margin-right: 2px;
+  width: 35px;
+  font-size: 20px;
+}
+.key_help:first-child, .arrows:first-child {
+  margin-top: 100px;
+}
+.button_table:hover {
+  color: #ffffff;
 }
